@@ -2,18 +2,18 @@ package br.com.raytracing.models;
 
 public class Color {
 
-	private byte r;
+	private int r;
 	
-	private byte g;
+	private int g;
 	
-	private byte b;
+	private int b;
 	
 	private int color;
 	
-	public Color(byte r, byte g, byte b) {
-		this.r = r;
-		this.g = g;
-		this.b = b;
+	public Color(int r, int g, int b) {
+		this.r = r > 255 ? 255 : r;
+		this.g = g > 255 ? 255 : g;
+		this.b = b > 255 ? 255 : b;
 		
 		this.color = 0;
 		this.color = (this.color | (this.r & 0XFF)) << 8;
@@ -26,27 +26,27 @@ public class Color {
 		this.color = color;
 	}
 
-	public byte getR() {
+	public int getR() {
 		return r;
 	}
 
-	public void setR(byte r) {
+	public void setR(int r) {
 		this.r = r;
 	}
 
-	public byte getG() {
+	public int getG() {
 		return g;
 	}
 
-	public void setG(byte g) {
+	public void setG(int g) {
 		this.g = g;
 	}
 
-	public byte getB() {
+	public int getB() {
 		return b;
 	}
 
-	public void setB(byte b) {
+	public void setB(int b) {
 		this.b = b;
 	}
 

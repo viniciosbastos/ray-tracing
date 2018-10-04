@@ -10,6 +10,8 @@ import br.com.raytracing.models.shapes.Shape;
 public class RayTracing {
 
     private Point p_vision;
+    
+    private Light light;
 
     private int distance;
 
@@ -23,8 +25,9 @@ public class RayTracing {
     
     private List<Shape> objects;
 
-    public RayTracing(Point p_vision, int d, ProjectionType type, int nx, int ny) {
+    public RayTracing(Point p_vision, Light light, int d, ProjectionType type, int nx, int ny) {
         this.p_vision = p_vision;
+        this.light = light;
         this.distance = d;
         this.type = type;
         this.base = new Base(p_vision);
@@ -101,9 +104,13 @@ public class RayTracing {
      */
     public void setType(ProjectionType type) {
         this.type = type;
-    }
+    }       
     
-    public Ray[][] getRayMatrix() {
+    public Light getLight() {
+		return light;
+	}
+
+	public Ray[][] getRayMatrix() {
     	return this.rayMatrix;
     }
     
@@ -158,7 +165,8 @@ public class RayTracing {
 					dist = shape.hits(rayMatrix[x][y]);
 					if (dist != -1 && dist < m_dist) {
 						m_dist = dist;
-						color = shape.getColor();
+//						color = shape.getColorLambert(rayMatrix[x][y], dist, this.light);
+						color = shape.getColorBlinnPhong(rayMatrix[x][y], dist, light, this.p_vision);
 					}
 				}
 				image.setRGB(x, y, color);			  

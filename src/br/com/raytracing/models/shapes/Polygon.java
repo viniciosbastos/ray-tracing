@@ -1,6 +1,7 @@
 package br.com.raytracing.models.shapes;
 
 import br.com.raytracing.models.Color;
+import br.com.raytracing.models.Light;
 import br.com.raytracing.models.Point;
 import br.com.raytracing.models.Ray;
 import br.com.raytracing.utils.MathUtils;
@@ -11,9 +12,16 @@ public class Polygon implements Shape{
 	
 	private Color color;
 	
+	private Point normal;
+	
 	public Polygon(Color color, Point ...points) {
 		this.points = points;
 		this.color = color;
+		
+		Point p1 = points[1].sub(points[0]);
+		Point p2 = points[2].sub(points[0]);
+		
+		this.normal = p1.cross(p2).divideByScalar(p1.cross(p2).norm());
 	}
 
 	public Point[] getPoints() {
@@ -23,10 +31,35 @@ public class Polygon implements Shape{
 	public void setPoints(Point[] points) {
 		this.points = points;
 	}
-	
+		
+	public Point getNormal() {
+		return normal;
+	}
+
 	@Override
-	public int getColor() {
-		return this.color.getColor();
+	public int getColorLambert(Ray ray, double distance, Light light) {
+		Point p = ray.getOrigin().sum(ray.getDirection().timesScalar(distance));
+		Point l = light.getSource().sub(p).divideByScalar(light.getSource().sub(p).norm());
+
+		int r = (int) (this.color.getR()*light.getI()*Math.max(0, this.normal.dot(l)));
+		int g = (int) (this.color.getG()*light.getI()*Math.max(0, this.normal.dot(l)));
+		int b = (int) (this.color.getB()*light.getI()*Math.max(0, this.normal.dot(l)));
+		
+		return new Color(r, g, b).getColor();
+	}
+
+	@Override
+	public int getColorBlinnPhong(Ray ray, double distance, Light light, Point vision) {
+		Point p = ray.getOrigin().sum(ray.getDirection().timesScalar(distance));
+		Point l = light.getSource().sub(p).divideByScalar(light.getSource().sub(p).norm());
+		Point v = vision.sub(p).divideByScalar(vision.sub(p).norm());
+		Point h = v.sum(l).divideByScalar(v.sum(l).norm());
+		
+		int r = (int) (this.color.getR()*light.getI()*Math.max(0, this.normal.dot(l)) + light.getLightColor().getR()*light.getI()*Math.pow(Math.max(0, this.normal.dot(h)), light.getP()));
+		int g = (int) (this.color.getG()*light.getI()*Math.max(0, this.normal.dot(l)) + light.getLightColor().getG()*light.getI()*Math.pow(Math.max(0, this.normal.dot(h)), light.getP()));
+		int b = (int) (this.color.getB()*light.getI()*Math.max(0, this.normal.dot(l)) + light.getLightColor().getB()*light.getI()*Math.pow(Math.max(0, this.normal.dot(h)), light.getP()));
+		
+		return new Color(r, g, b).getColor();
 	}
 
 
